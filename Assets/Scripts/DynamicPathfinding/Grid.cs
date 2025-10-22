@@ -4,6 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+/*
+ * 
+ * Created by Arija Hartel (@cocoatehcat)
+ * HEAVILY references CatLikeCoding
+ * Purpose: Make Grid
+ * 
+ */
+
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class Grid : MonoBehaviour
 {
