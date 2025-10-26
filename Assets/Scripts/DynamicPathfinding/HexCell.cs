@@ -10,6 +10,7 @@ using UnityEngine;
 
 public class HexCell : MonoBehaviour
 {
+    private bool isWall = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,5 +21,10 @@ public class HexCell : MonoBehaviour
     void Update()
     {
         
+    }
+    public void SetWall(bool wall)
+    {
+        isWall = wall;
+        GetComponent<Renderer>().material.color = Color.red;
     }
 }

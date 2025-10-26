@@ -42,4 +42,8 @@ public class HexGrid : MonoBehaviour
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
     }
+    public HexCell[] GetCells()
+    {
+        return cells;
+    }
 }

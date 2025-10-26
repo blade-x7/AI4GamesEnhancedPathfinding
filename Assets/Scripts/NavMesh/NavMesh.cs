@@ -5,24 +5,22 @@ using UnityEditor;
 
 public class NavMesh : MonoBehaviour
 {
-    Vector2[] vertices;
-    Vector2[] outputVertices;
+    [SerializeField] private HexGrid grid;
+    [SerializeField] private LayerMask mask;
 
-    const string OBSTACLE_TAG = "Obstacle";
+    const float UP_LENGTH = 5f;
 
     public void BakeMesh()
     {
-        if(vertices.Length == 0) return;
-        List<Vector2> outputList = new();
-        foreach (Vector2 v in vertices)
+        HexCell[] cells = grid.GetCells();
+        if(cells.Length == 0) return;
+        foreach (HexCell h in cells)
         {
-            Collider2D hit = Physics2D.OverlapPoint(v);
-            if (hit == null || hit.CompareTag(OBSTACLE_TAG))
+            if (Physics.Raycast(h.transform.position + Vector3.up * UP_LENGTH, Vector3.down, Mathf.Infinity, mask))
             {
-                outputList.Add(v);
+                h.SetWall(true);
             }
         }
-        outputVertices = outputList.ToArray();
     }
 }
 
