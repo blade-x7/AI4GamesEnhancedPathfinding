@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+[RequireComponent(typeof(HexGrid))]
 public class NavMesh : MonoBehaviour
 {
     [SerializeField] private HexGrid grid;

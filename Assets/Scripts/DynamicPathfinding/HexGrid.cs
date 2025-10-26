@@ -45,6 +45,10 @@ public class HexGrid : MonoBehaviour
             }
         }
         cells = null;
+        foreach(Transform child in transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
     }
     private void CreateCell(int x, int z, int i)
     {
