@@ -12,6 +12,8 @@ public class NavMesh : MonoBehaviour
 
     public void BakeMesh()
     {
+        grid.DestroyGrid();
+        grid.InstantiateGrid();
         HexCell[] cells = grid.GetCells();
         if(cells.Length == 0) return;
         foreach (HexCell h in cells)
@@ -21,6 +23,10 @@ public class NavMesh : MonoBehaviour
                 h.SetWall(true);
             }
         }
+    }
+    public void DestroyMesh()
+    {
+        grid.DestroyGrid();
     }
 }
 
@@ -35,6 +41,10 @@ public class NavMeshEditor : Editor
         if(GUILayout.Button("Bake Mesh"))
         {
             mesh.BakeMesh();
+        }
+        if(GUILayout.Button("Destroy Mesh"))
+        {
+            mesh.DestroyMesh();
         }
     }
 }

@@ -20,6 +20,10 @@ public class HexGrid : MonoBehaviour
 
     private void Awake()
     {
+
+    }
+    public void InstantiateGrid()
+    {
         cells = new HexCell[width * height];
 
         for (int z = 0, i = 0; z < height; z++)
@@ -30,7 +34,18 @@ public class HexGrid : MonoBehaviour
             }
         }
     }
-
+    public void DestroyGrid()
+    {
+        if (cells == null) return;
+        for (int i = 0; i < cells.Length; i++)
+        {
+            if (cells[i] != null)
+            {
+                DestroyImmediate(cells[i].gameObject);
+            }
+        }
+        cells = null;
+    }
     private void CreateCell(int x, int z, int i)
     {
         Vector3 position;

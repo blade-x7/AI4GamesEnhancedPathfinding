@@ -10,6 +10,7 @@ using UnityEngine;
 
 public class HexCell : MonoBehaviour
 {
+    [SerializeField] private GameObject wallMarker;
     private bool isWall = false;
     // Start is called before the first frame update
     void Start()
@@ -25,6 +26,6 @@ public class HexCell : MonoBehaviour
     public void SetWall(bool wall)
     {
         isWall = wall;
-        GetComponent<Renderer>().material.color = Color.red;
+        Instantiate(wallMarker, transform);
     }
 }
