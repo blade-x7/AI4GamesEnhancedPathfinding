@@ -14,6 +14,8 @@ public class HexGrid : MonoBehaviour
     public int width = 6;
     public int height = 6;
 
+    [SerializeField] float distApart;
+
     public HexCell cellPrefab;
 
     HexCell[] cells;
@@ -53,9 +55,9 @@ public class HexGrid : MonoBehaviour
     private void CreateCell(int x, int z, int i)
     {
         Vector3 position;
-        position.x = x * 10f;
+        position.x = x * distApart - ((width - 1) * distApart * 0.5f);
         position.y = 0f;
-        position.z = z * 10f;
+        position.z = z * distApart - ((height - 1) * distApart * 0.5f);
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
         cell.transform.SetParent(transform, false);
