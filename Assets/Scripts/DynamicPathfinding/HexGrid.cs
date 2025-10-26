@@ -38,7 +38,9 @@ public class HexGrid : MonoBehaviour
     }
     public void DestroyGrid()
     {
+        // Return if the grid doesn't exist yet
         if (cells == null) return;
+        // Loop through the cell list and destroy objects there
         for (int i = 0; i < cells.Length; i++)
         {
             if (cells[i] != null)
@@ -46,7 +48,9 @@ public class HexGrid : MonoBehaviour
                 DestroyImmediate(cells[i].gameObject);
             }
         }
+        // Reset the array
         cells = null;
+        // Destroy all children in case they were removed from the cell array at some point
         foreach(Transform child in transform)
         {
             DestroyImmediate(child.gameObject);

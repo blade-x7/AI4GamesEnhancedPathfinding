@@ -26,6 +26,7 @@ public class HexCell : MonoBehaviour
     public void SetWall(bool wall)
     {
         isWall = wall;
+        // Create marker designating the current cell as a wall
         Instantiate(wallMarker, transform);
     }
 }
