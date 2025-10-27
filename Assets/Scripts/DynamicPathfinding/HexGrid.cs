@@ -1,5 +1,8 @@
 using System;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 /*
  * 
@@ -13,20 +16,25 @@ public class HexGrid : MonoBehaviour
 {
     public int width = 6;
     public int height = 6;
+    public TMP_Text cellLabel;
+
+    public Canvas gridCanvas;
 
     [SerializeField] float distApart;
 
     public HexCell cellPrefab;
 
     HexCell[] cells;
+    TMP_Text[] labels;
 
     private void Awake()
     {
-
+        
     }
     public void InstantiateGrid()
     {
         cells = new HexCell[width * height];
+        labels = new TMP_Text[width * height];
 
         for (int z = 0, i = 0; z < height; z++)
         {
@@ -55,20 +63,56 @@ public class HexGrid : MonoBehaviour
         {
             DestroyImmediate(child.gameObject);
         }
+
+        // Covering the UI
+        if (labels == null) return;
+
+        for (int i = 0; i < labels.Length; i++)
+        {
+            if (labels[i] != null)
+            {
+                DestroyImmediate(labels[i].gameObject);
+            }
+        }
+
+        cells = null;
     }
     private void CreateCell(int x, int z, int i)
     {
         Vector3 position;
-        position.x = x * distApart - ((width - 1) * distApart * 0.5f);
+        position.x = (x + z * 0.5f - z / 2) * (HexMetrics.innerRadius * distApart);
         position.y = 0f;
-        position.z = z * distApart - ((height - 1) * distApart * 0.5f);
+        position.z = z * (HexMetrics.outerRadius * distApart);
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
+
+        TMP_Text label = labels[i] = Instantiate<TMP_Text>(cellLabel);
+        label.rectTransform.SetParent(gridCanvas.transform, false);
+        label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
+        label.text = x.ToString() + "\n" + z.ToString();
     }
     public HexCell[] GetCells()
     {
         return cells;
+    }
+}
+
+
+[CustomEditor(typeof(HexGrid))]
+public class HexGridEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        var hexGrid = (HexGrid)target;
+
+        if (GUILayout.Button("Generate Grid", GUILayout.Width(200)))
+        {
+            hexGrid.DestroyGrid();
+            hexGrid.InstantiateGrid();
+        }
     }
 }
