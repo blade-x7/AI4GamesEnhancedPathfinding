@@ -520,6 +520,8 @@ MonoBehaviour:
   - {x: 4, y: 2}
   - {x: 1, y: 5}
   - {x: 6, y: 5}
+  - {x: 5, y: 8}
+  - {x: 7, y: 7}
   interpolatedList: []
   samples: 7
   blue: {fileID: 2100000, guid: 228035b20cd0d7046a3c0cdd99d3ad8e, type: 2}
