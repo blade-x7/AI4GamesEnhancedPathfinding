@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -28,6 +30,8 @@ public class HexGrid : MonoBehaviour
 
     HexCell[] cells;
     TMP_Text[] labels;
+
+    public Vector3 startPos, endPos;
 
     private void Awake()
     {
@@ -107,6 +111,30 @@ public class HexGrid : MonoBehaviour
         cell.transform.localPosition = position;
         cell.coordinates = HexCoords.FromOffsetCoords(x, z);
 
+        if (x > 0)
+        {
+            cell.SetNeighbor(HexDirection.W, cells[i - 1]);
+        }
+        if (z > 0)
+        {
+            if ((z & 1) == 0)
+            {
+                cell.SetNeighbor(HexDirection.SE, cells[i - width]);
+                if (x > 0)
+                {
+                    cell.SetNeighbor(HexDirection.SW, cells[i - width - 1]);
+                }
+            }
+            else
+            {
+                cell.SetNeighbor(HexDirection.SW, cells[i - width]);
+                if (x < width - 1)
+                {
+                    cell.SetNeighbor(HexDirection.SE, cells[i - width + 1]);
+                }
+            }
+        }
+
         TMP_Text label = labels[i] = Instantiate<TMP_Text>(cellLabel);
         label.rectTransform.SetParent(gridCanvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
@@ -117,7 +145,38 @@ public class HexGrid : MonoBehaviour
         return cells;
     }
 
+    public void FindDistancesTo (HexCell cell)
+    {
+        StopAllCoroutines();
+        StartCoroutine(Search(cell));
+    }
     
+    IEnumerator Search (HexCell cell)
+    {
+        for (int i = 0; i < cells.Length; i++)
+        {
+            cells[i].Distance = int.MaxValue;
+        }
+
+        WaitForSeconds delay = new WaitForSeconds(1 / 60f);
+        Queue<HexCell> frontier = new Queue<HexCell>();
+        frontier.Enqueue(cell);
+
+        while (frontier.Count > 0)
+        {
+            yield return delay;
+            HexCell current = frontier.Dequeue();
+            for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
+            {
+                HexCell neighbor = current.GetNeighbor(d);
+                if (neighbor != null && neighbor.Distance == int.MaxValue)
+                {
+                    neighbor.Distance = current.Distance + 1;
+                    frontier.Enqueue(neighbor);
+                }
+            }
+        }
+    }
 }
 
 
@@ -134,6 +193,10 @@ public class HexGridEditor : Editor
         {
             hexGrid.DestroyGrid();
             hexGrid.InstantiateGrid();
+        }
+        if (GUILayout.Button("Calculate Path", GUILayout.Width(200)))
+        {
+            Debug.Log("Test!");
         }
     }
 }
