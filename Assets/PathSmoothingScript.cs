@@ -14,6 +14,7 @@ public class PathSmoothingScript : MonoBehaviour
 
     [SerializeField] Material blue;
 
+    //get a smoothed curve between three points, will pass by middle "control" point
     Vector2 QuadraticBezier(Vector2 start, Vector2 control, Vector2 end, float interpolationFactor)
     {
         Vector2 result;
@@ -27,12 +28,13 @@ public class PathSmoothingScript : MonoBehaviour
         return result;
     }
 
+    //smoothed curve between four points, guaranteed to hit every point
     Vector2 GetSplinePoint(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
     {
         Vector2 result = new Vector2();
 
+        //store some variables
         t = t - (int)t;
-
         float tSquared = t * t;
         float tCubed = tSquared * t;
 
@@ -42,6 +44,7 @@ public class PathSmoothingScript : MonoBehaviour
         float q3 = (-3.0f * tCubed) + (4.0f * tSquared) + t;
         float q4 = tCubed - tSquared;
 
+        //apply degrees of influence to each point accordingly and calculate x and y coordinates
         result.x = 0.5f * ((p0.x * q1) + (p1.x * q2) + (p2.x * q3) + (p3.x * q4));
         result.y = 0.5f * ((p0.y * q1) + (p1.y * q2) + (p2.y * q3) + (p3.y * q4));
 
@@ -50,6 +53,7 @@ public class PathSmoothingScript : MonoBehaviour
 
     public List<Vector2> Interpolate(List<Vector2> path, int samplesPerSegment)
     {
+        //path has one or zero points safeguard
         if (path.Count < 2){
             return path;
         }
@@ -62,8 +66,10 @@ public class PathSmoothingScript : MonoBehaviour
         List<Vector2> resultPath = new List<Vector2>();
         resultPath.Add(path[0]);
 
+        //path has two points safeguard
         if (path.Count == 2)
         {
+            //sir that is a line
             for (int sampleIndex = 1; sampleIndex < samplesPerSegment; sampleIndex++)
             {
                 float t = (float)sampleIndex / samplesPerSegment;
@@ -74,43 +80,66 @@ public class PathSmoothingScript : MonoBehaviour
             return resultPath;
         }
 
-        int p0, p1, p2, p3;
+        //path has three points safeguard
+        if (path.Count == 3)
+        {
+            //bezier curve it
+            for (int sampleIndex = 1; sampleIndex < samplesPerSegment; sampleIndex++)
+            {
+                float t = (float)sampleIndex / samplesPerSegment;
+                Vector2 interpolatedPoint = QuadraticBezier(path[0], path[1], path[2], t);
+                resultPath.Add(interpolatedPoint);
+            }
+            resultPath.Add(path[2]);
+            return resultPath;
+        }
+
+        int p0, p1, p2, p3; //indices of the points we'll reference in the method
 
         for (float i = 0; i < (float)path.Count - 3.0f; i += 0.05f)
         {
+            //set reference point indices
             p1 = (int)i + 1;
             p2 = p1 + 1;
             p3 = p2 + 1;
             p0 = p1 - 1;
 
+            //get new point and add it to the new path
             Vector2 interpolatedPoint = GetSplinePoint(i, path[p0], path[p1], path[p2], path[p3]);
             resultPath.Add(interpolatedPoint);
         }
+        resultPath.Add(path[path.Count - 1]);
 
         return resultPath;
     }
 
     public void DrawPath(List<Vector2> path)
     {
+        //clear the screen of the previous path
         for (int i = drawnPath.Count - 1; i >= 0; i--)
         {
             DestroyImmediate(drawnPath[i]);
         }
         drawnPath.Clear();
 
+        //reset interpolated path
         interpolatedList.Clear();
         interpolatedList = Interpolate(path, samples);
 
+        //draw the initial points in blue
         foreach (Vector2 i in path)
         {
+            //initialize game object at point and add it to the drawn path list
             Vector3 newPoint = new Vector3(i.x, 0.0f, i.y);
             GameObject newObject = GameObject.Instantiate(dot, newPoint, Quaternion.identity);
             newObject.gameObject.GetComponent<MeshRenderer>().material = blue;
             drawnPath.Add(newObject);
         }
 
+        //draw the smoothed path
         foreach (Vector2 i in interpolatedList)
         {
+            //initialize game object at point and add it to the drawn path list
             Vector3 newPoint = new Vector3(i.x, 0.0f, i.y);
             GameObject newObject = GameObject.Instantiate(dot, newPoint, Quaternion.identity);
             drawnPath.Add(newObject);
