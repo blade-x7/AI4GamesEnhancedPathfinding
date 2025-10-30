@@ -24,6 +24,8 @@ public class HexGrid : MonoBehaviour
 
     public HexCell cellPrefab;
 
+    public HexMesh hexMesh;
+
     HexCell[] cells;
     TMP_Text[] labels;
 
@@ -31,6 +33,12 @@ public class HexGrid : MonoBehaviour
     {
         
     }
+
+    private void Start()
+    {
+        
+    }
+
     public void InstantiateGrid()
     {
         cells = new HexCell[width * height];
@@ -43,6 +51,11 @@ public class HexGrid : MonoBehaviour
                 CreateCell(x, z, i++);
             }
         }
+
+        hexMesh.LoadMesh();
+
+        hexMesh.Triangulate(cells);
+
     }
     public void DestroyGrid()
     {
@@ -58,11 +71,6 @@ public class HexGrid : MonoBehaviour
         }
         // Reset the array
         cells = null;
-        // Destroy all children in case they were removed from the cell array at some point
-        foreach(Transform child in transform)
-        {
-            DestroyImmediate(child.gameObject);
-        }
 
         // Covering the UI
         if (labels == null) return;
@@ -76,6 +84,16 @@ public class HexGrid : MonoBehaviour
         }
 
         cells = null;
+
+        /*
+         * Trying to fix this as it makes things grumpy
+         * 
+         * // Destroy all children in case they were removed from the cell array at some point
+        foreach(Transform child in transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
+         */
     }
     private void CreateCell(int x, int z, int i)
     {
@@ -87,16 +105,19 @@ public class HexGrid : MonoBehaviour
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
+        cell.coordinates = HexCoords.FromOffsetCoords(x, z);
 
         TMP_Text label = labels[i] = Instantiate<TMP_Text>(cellLabel);
         label.rectTransform.SetParent(gridCanvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
-        label.text = x.ToString() + "\n" + z.ToString();
+        label.text = cell.coordinates.ToStringOnSepLines();
     }
     public HexCell[] GetCells()
     {
         return cells;
     }
+
+    
 }
 
 

@@ -12,6 +12,9 @@ public class HexCell : MonoBehaviour
 {
     [SerializeField] private GameObject wallMarker;
     private bool isWall = false;
+
+    public HexCoords coordinates;
+
     // Start is called before the first frame update
     void Start()
     {
